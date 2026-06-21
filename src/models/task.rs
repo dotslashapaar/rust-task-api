@@ -1,9 +1,9 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::prelude::FromRow;
+use sqlx::prelude::{FromRow, Type};
 use uuid::Uuid;
 
-#[derive(Debug, Clone, Serialize, Deserialize, sqlx::Type, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, Type, PartialEq)]
 #[serde(rename_all = "lowercase")]
 #[sqlx(type_name = "task_status", rename_all = "lowercase")]
 pub enum TaskStatus {
@@ -12,6 +12,7 @@ pub enum TaskStatus {
     Completed,
 }
 
+// represents single task in our system
 #[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
 pub struct Task {
     pub id: Uuid,
@@ -19,20 +20,20 @@ pub struct Task {
     pub description: Option<String>,
     pub status: TaskStatus,
     pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>
+    pub updated_at: DateTime<Utc>,
 }
 
-// Used for incoming POST requests
+// CreateTask is used for incoming POST requests
 #[derive(Debug, Deserialize)]
 pub struct CreateTask {
     pub title: String,
     pub description: Option<String>,
 }
 
-// Does updates via PATCH requests
+// UpdateTask partial updates via PATCH requests
 #[derive(Debug, Deserialize)]
-pub struct UpdateTask{
+pub struct UpdateTask {
     pub title: Option<String>,
     pub description: Option<String>,
-    pub status: Option<TaskStatus>
+    pub status: Option<TaskStatus>,
 }
