@@ -42,7 +42,7 @@ impl TaskRepository {
         .bind(id)
         .fetch_optional(&self.pool)
         .await?
-        .ok_or_else(|| AppError::NotFound(format!("Task with id {} not found")))
+        .ok_or_else(|| AppError::NotFound(format!("Task with id {} not found", id)))
     }
 
     pub async fn create(&self, input: CreateTask) -> AppResult<Task> {
