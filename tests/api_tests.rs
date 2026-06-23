@@ -1,13 +1,41 @@
+use std::time::Duration;
+
 use axum::{
     Router,
     body::Body,
     http::{Request, StatusCode},
+    response::Response,
 };
 use serde_json::{Value, json};
+use task_api::{
+    db::{pool::create_pool, tasks::TaskRepository},
+    handlers::tasks::AppState,
+    routes::tasks::task_routes,
+};
 use tower::ServiceExt;
+use tower_http::trace::TraceLayer;
+use tracing::Span;
 
 async fn setup_test_app() -> Router {
-    todo!()
+    dotenvy::dotenv().ok();
+
+    let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+
+    tracing::info!("Connecting to database");
+    let pool = create_pool(&database_url).await.unwrap();
+    tracing::info!("Database connection established");
+
+    tracing::info!("Running database migrations...");
+    sqlx::migrate!("./migrations").run(&pool).await.unwrap();
+    tracing::info!("Migrations complete");
+
+    let state = AppState {
+        task_repo: TaskRepository::new(pool),
+    };
+
+    let app = Router::new().merge(task_routes()).with_state(state);
+
+    app
 }
 
 #[tokio::test]

@@ -5,17 +5,11 @@ use tower_http::trace::TraceLayer;
 use tracing::Span;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
-use crate::{
+use task_api::{
     db::{pool::create_pool, tasks::TaskRepository},
     handlers::tasks::AppState,
     routes::tasks::task_routes,
 };
-
-mod db;
-mod error;
-mod handlers;
-mod models;
-mod routes;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
